@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram x TON Blockchain</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tonweb/dist/tonweb.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Telegram x TON Blockchain</h1>
+    <p>Welcome to the integration of Telegram Web App SDK with the TON blockchain!</p>
+    <button id="getUserData">Get Telegram User Data</button>
+    <button id="sendTonTransaction">Send TON Transaction</button>
+    <div id="output"></div>
+
+    <script>
+        // Initialize Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Handle "Get Telegram User Data" button
+        document.getElementById('getUserData').addEventListener('click', () => {
+            const userData = tg.initDataUnsafe.user;
+            const output = document.getElementById('output');
+            output.innerHTML = `<h3>User Info:</h3>
+                                <p>ID: ${userData.id}</p>
+                                <p>First Name: ${userData.first_name}</p>
+                                <p>Last Name: ${userData.last_name || 'N/A'}</p>
+                                <p>Username: ${userData.username || 'N/A'}</p>`;
+        });
+
+        // TON blockchain example
+        const TonWeb = window.TonWeb;
+        const tonweb = new TonWeb();
+        const walletAddress = '0xFdCfaA36e8eB1c2ea642aa3Cce39ebA319aF35a5'; // Replace with your wallet address
+        const walletKey = 'ba945459a3ce742de51eaa85995a6a2e8a01321c16b1f1ba1e2f44fcd7c5f1f9'; // Replace with your private key
+
+        document.getElementById('sendTonTransaction').addEventListener('click', async () => {
+            try {
+                const fromWallet = new tonweb.wallet.Wallet({
+                    address: walletAddress,
+                    privateKey: walletKey,
+                });
+
+                const recipient = '<RECIPIENT_WALLET_ADDRESS>'; // Replace with recipient's wallet address
+                const amount = TonWeb.utils.toNano('0.1'); // 0.1 TON
+
+                await fromWallet.transfer({
+                    toAddress: recipient,
+                    amount: amount,
+                    seqno: await fromWallet.getSeqno(),
+                });
+
+                document.getElementById('output').innerText = 'Transaction sent successfully!';
+            } catch (err) {
+                console.error(err);
+                document.getElementById('output').innerText = 'Error sending transaction!';
+            }
+        });
+    </script>
+</body>
+</html>
